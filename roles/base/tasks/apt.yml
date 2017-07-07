@@ -1,0 +1,21 @@
+- name: Add apt-transport-https
+  apt:
+    name: 'apt-transport-https'
+    state: present
+    force: yes
+
+- name: Install Packages
+  apt:
+    name: "{{ item }}"
+    force: yes
+    state: present
+    update_cache: yes
+  with_items:
+    - hdparm
+    - iperf
+    - mtr-tiny
+    - bridge-utils
+    - socat
+    - jq
+    - attr
+

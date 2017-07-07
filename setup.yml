@@ -1,0 +1,45 @@
+---
+- name: Install Python
+  hosts: all
+  gather_facts: no
+  become: true
+  become_method: sudo
+
+  tasks:
+    - name: Install Python
+      raw: apt-get -y install python
+
+- name: Setup Base system
+  hosts: all
+  gather_facts: yes
+  become: true
+  become_method: sudo
+  vars_files:
+    - config.yml
+
+  roles:
+    - role: squid
+      squid_visible_hostname: "{{ ansible_hostname }}"
+      squid_cache_dirs:
+        - diskd /var/lib/squid1 102400 32 512 Q1=64 Q2=72
+        - diskd /var/lib/squid2 102400 32 512 Q1=64 Q2=72
+        - diskd /var/lib/squid3 102400 32 512 Q1=64 Q2=72
+        - diskd /var/lib/squid4 102400 32 512 Q1=64 Q2=72
+      squid_memory_replacement_policy: heap GDSF
+      squid_cache_mem: 10 GB   
+      squid_http_access_allow_clients:
+        - clients
+      squid_acls:
+        - name: clients 
+          type: src
+          argument: 46.249.120.0/24
+        - name: clients
+          type: src
+          argument: 46.249.126.128/26
+        - name: clients
+          type: src
+          argument: 192.168.10.0/24
+        - name: clients
+          type: src
+          argument: 172.16.16.0/24
+    - role: tproxy

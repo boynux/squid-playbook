@@ -1,0 +1,92 @@
+# {{ ansible_managed }}
+
+acl SSL_ports port 443
+acl Safe_ports port 80		# http
+acl Safe_ports port 21		# ftp
+acl Safe_ports port 443		# https
+acl Safe_ports port 70		# gopher
+acl Safe_ports port 210		# wais
+acl Safe_ports port 1025-65535	# unregistered ports
+acl Safe_ports port 280		# http-mgmt
+acl Safe_ports port 488		# gss-http
+acl Safe_ports port 591		# filemaker
+acl Safe_ports port 777		# multiling http
+acl CONNECT method CONNECT
+
+{% if squid_acls %}
+{% for acl in squid_acls %}
+acl {{ acl.name }} {{ acl.type }} {{ acl.argument }}
+{% endfor %}
+{% endif %}
+
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports
+http_access allow localhost manager
+http_access deny manager
+{% for client in squid_http_access_allow_clients %}
+http_access allow {{ client }}
+{% endfor %}
+http_access deny all
+
+{% for listen in squid_listeners %}
+http_port {{ listen.squid_http_port }} {{ listen.squid_proxy_mode }}
+{% endfor %}
+
+{% if squid_tcp_outgoing_address %}
+tcp_outgoing_address {{ squid_tcp_outgoing_address }}
+{% endif %}
+
+{% if squid_cache_peers %}
+{% for cache_peer in squid_cache_peers %}
+cache_peer {{ cache_peer.hostname }} {{ cache_peer.type }} {{ cache_peer.proxy_port }} {{ cache_peer.icp_port }} {{ cache_peer.options | join(" ") }}
+{% endfor %}
+{% endif %}
+
+coredump_dir {{ squid_coredump_dir }}
+
+refresh_pattern ^ftp:		1440	20%	10080
+refresh_pattern ^gopher:	1440	0%	1440
+refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
+refresh_pattern (Release|Packages(.gz)*)$      0       20%     2880
+refresh_pattern .		0	20%	4320
+
+{% if squid_always_directs %}
+{% for always_direct in squid_always_directs %}
+always_direct {{ always_direct.type }} {{ always_direct.acl_name }}
+{% endfor %}
+{% endif %}
+
+{% if squid_never_directs %}
+{% for never_direct in squid_never_directs %}
+never_direct {{ never_direct.type }} {{ never_direct.acl_name }}
+{% endfor %}
+{% endif %}
+
+dns_v4_first {{ squid_dns_v4_first }}
+
+via {{ squid_via }}
+
+httpd_suppress_version_string {{ squid_httpd_suppress_version_string }}
+
+forwarded_for {{ squid_forwarded_for }}
+
+{% if squid_proxy_only %}
+cache deny all
+{% endif %}
+
+access_log {{ squid_access_log }}
+
+netdb_filename {{ squid_netdb_filename }}
+
+pinger_enable {{ squid_pinger_enable }}
+
+{% if squid_visible_hostname is defined and squid_visible_hostname != '' %}
+visible_hostname {{ squid_visible_hostname }}
+{% endif %}
+
+cache_mem {{ squid_cache_mem }}
+memory_replacement_policy {{ squid_memory_replacement_policy }}
+
+{% for cache_dir in squid_cache_dirs %}
+cache_dir {{ cache_dir }}
+{% endfor %}

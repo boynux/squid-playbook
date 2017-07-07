@@ -1,0 +1,13 @@
+---
+# tasks file for squid (Ubuntu specific)
+
+- name: Install squid packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - "{{ squid_packages }}"
+  tags:
+    - squid

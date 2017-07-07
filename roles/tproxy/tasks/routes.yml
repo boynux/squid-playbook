@@ -1,0 +1,28 @@
+---
+
+- name: Install iproute2
+  apt:
+    name: 'iproute2'
+    state: 'present'
+
+- name: Add route table name
+  lineinfile:
+    dest: /etc/iproute2/rt_tables
+    line: "100     tproxy"
+    state: present
+
+- name: Generate route table 
+  template:
+    src: routes.j2
+    dest: '/etc/network/if-up.d/tproxy'
+    owner: 'root'
+    group: 'root'
+    mode: '0775'
+  register: routes_register_config
+
+- name: Reload networking service
+  service:
+    name: 'networking'
+    state: 'reloaded'
+    enabled: True
+  when: iptables_register_config | changed

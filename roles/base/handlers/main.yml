@@ -1,0 +1,7 @@
+---
+- name: update timezone
+  command: timedatectl set-timezone "{{ timezone }}"
+
+- name: Restart hostname
+  command: hostnamectl set-hostname "{{ name }}"
+

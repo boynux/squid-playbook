@@ -1,0 +1,5 @@
+---
+# default parameters for tproxy
+
+tproxy_input_port: 80
+tproxy_port: 3128

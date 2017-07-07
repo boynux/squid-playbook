@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Only run when lo is up
+test "$IFACE" = "lo" || exit 0
+
+ip -f inet route add local default dev lo table tproxy
+ip rule add fwmark 1 lookup tproxy
