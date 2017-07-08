@@ -23,6 +23,6 @@
 - name: Reload networking service
   service:
     name: 'networking'
-    state: 'reloaded'
+    state: 'restarted'
     enabled: True
   when: iptables_register_config | changed

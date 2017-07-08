@@ -47,6 +47,13 @@
   tags:
     - squid
 
+- name: Create /var/lib/squid directory
+  file:
+    path: '/var/lib/squid'
+    state: 'directory'
+    owner: proxy
+    group: proxy
+
 - name: Create Squid MSNT auth configuration file
   become: yes
   template:

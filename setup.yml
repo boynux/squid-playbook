@@ -18,13 +18,14 @@
     - config.yml
 
   roles:
+    - role: base
     - role: squid
       squid_visible_hostname: "{{ ansible_hostname }}"
       squid_cache_dirs:
-        - diskd /var/lib/squid1 102400 32 512 Q1=64 Q2=72
-        - diskd /var/lib/squid2 102400 32 512 Q1=64 Q2=72
-        - diskd /var/lib/squid3 102400 32 512 Q1=64 Q2=72
-        - diskd /var/lib/squid4 102400 32 512 Q1=64 Q2=72
+        - diskd /var/lib/squid/1 102400 32 512 Q1=64 Q2=72
+        - diskd /var/lib/squid/2 102400 32 512 Q1=64 Q2=72
+        - diskd /var/lib/squid/3 102400 32 512 Q1=64 Q2=72
+        - diskd /var/lib/squid/4 102400 32 512 Q1=64 Q2=72
       squid_memory_replacement_policy: heap GDSF
       squid_cache_mem: 10 GB   
       squid_http_access_allow_clients:
